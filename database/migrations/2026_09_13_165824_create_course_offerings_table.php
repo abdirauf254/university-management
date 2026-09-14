@@ -6,20 +6,53 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('course_offerings', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('university_id')
+                ->constrained('universities')
+                ->cascadeOnDelete();
+
+            $table->foreignId('course_id')
+                ->constrained('courses')
+                ->restrictOnDelete();
+
+            $table->foreignId('academic_year_id')
+                ->constrained('academic_years')
+                ->restrictOnDelete();
+
+            $table->foreignId('semester_id')
+                ->constrained('semesters')
+                ->restrictOnDelete();
+
+            $table->string('section')->default('A');
+
+            $table->unsignedInteger('capacity')->nullable();
+
+            $table->string('status')->default('planned');
+
             $table->timestamps();
+
+            $table->unique([
+                'course_id',
+                'semester_id',
+                'section'
+            ]);
+
+            $table->index('university_id');
+            $table->index('course_id');
+            $table->index('academic_year_id');
+            $table->index('semester_id');
+
+            $table->index([
+                'university_id',
+                'status'
+            ]);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('course_offerings');
