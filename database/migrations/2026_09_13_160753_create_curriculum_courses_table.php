@@ -6,20 +6,33 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('curriculum_courses', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('curriculum_id')
+                ->constrained('curricula')
+                ->cascadeOnDelete();
+
+            $table->foreignId('course_id')
+                ->constrained('courses')
+                ->restrictOnDelete();
+
+            $table->unsignedTinyInteger('year_of_study');
+            $table->unsignedTinyInteger('semester_number');
+
+            $table->boolean('is_core')->default(true);
+
+            $table->decimal('credit_hours', 5, 2);
+
             $table->timestamps();
+
+            $table->unique(['curriculum_id', 'course_id']);
+            $table->index('course_id');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('curriculum_courses');
